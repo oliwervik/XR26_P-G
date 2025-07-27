@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming & Game Engines Part 3: Course Brief - XR26</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors */
+            --primary-orange: #FF6B35;
+            --secondary-orange: #F7931E;
+            --dark-navy: #1A1A2E;
+            --deep-navy: #0F0F1A;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            
+            /* Accent Colors */
+            --accent-green: #00D4AA;
+            --accent-green-dark: #00B89C;
+            --accent-pink: #FF6B9D;
+            --text-dark: #2C2C54;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            --gradient-green: linear-gradient(135deg, #00D4AA 0%, #00B89C 100%);
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(10px);
+        }
+
+        /* Smooth Scrolling Setup */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            color: var(--white);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Section/Slide Styling */
+        .slide {
+            display: flex;
+            min-height: 100vh;
+            padding: 40px 20px;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            scroll-snap-align: start;
+        }
+
+        .slide-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Scroll Pagination Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .scroll-dot.active {
+            background: var(--accent-green);
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
+        }
+
+        .scroll-dot:hover {
+            background: var(--accent-green);
+            transform: scale(1.1);
+        }
+
+        /* Slide separator */
+        .slide-separator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0.5;
+        }
+
+        /* Title Slide */
+        .title-slide {
+            background: linear-gradient(135deg, #2C2C54 0%, #1A1A2E 50%, #0F0F1A 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .title-slide h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            letter-spacing: -0.01em;
+        }
+
+        .title-slide .subtitle {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-bottom: 50px;
+            opacity: 0.8;
+        }
+
+        .session-meta {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .session-meta p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Overview Slide */
+        .overview-slide {
+            background: linear-gradient(135deg, #1A1A2E 0%, #0F0F1A 100%);
+            color: var(--white);
+        }
+
+        .overview-slide h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #00D4AA;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 212, 170, 0.3);
+        }
+
+        .overview-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .overview-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 6px solid var(--accent-green);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .overview-section h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .overview-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .overview-section li {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .overview-section li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Content Slides */
+        .content-slide {
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            color: var(--white);
+        }
+
+        .content-slide h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #00D4AA;
+            margin-bottom: 40px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 212, 170, 0.3);
+        }
+
+        .content-body {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .week-header {
+            background: linear-gradient(135deg, #3A3A6B 0%, #2C2C54 100%);
+            color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(58, 58, 107, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .week-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .week-header p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .week-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .session-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 6px solid var(--accent-green);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .session-card h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .session-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .session-card li {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .session-card li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-orange);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border-top: 4px solid var(--accent-green);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .skill-card i {
+            font-size: 3rem;
+            color: var(--accent-green);
+            margin-bottom: 20px;
+        }
+
+        .skill-card h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--white);
+            letter-spacing: -0.01em;
+        }
+
+        .skill-card p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Assessment Slide */
+        .assessment-slide {
+            background: linear-gradient(135deg, #1A1A2E 0%, #0F0F1A 100%);
+            color: var(--white);
+        }
+
+        .assessment-breakdown {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .assessment-item {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            margin: 0 15px;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .assessment-percentage {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00D4AA;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 212, 170, 0.3);
+        }
+
+        .assessment-item h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+            letter-spacing: -0.01em;
+        }
+
+        .assessment-details {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Learning Journey Slide */
+        .journey-timeline {
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #00D4AA 0%, #00B89C 50%, #00D4AA 100%);
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px rgba(0, 212, 170, 0.3);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 60px;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 0 40px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border: 15px solid transparent;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -30px;
+            border-left-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -30px;
+            border-right-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-marker {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00D4AA 0%, #00B89C 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 1;
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.4);
+        }
+
+        .timeline-content h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--white);
+            letter-spacing: -0.01em;
+        }
+
+        .timeline-content p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Final Project Slide */
+        .project-examples {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 6px solid var(--accent-green);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-card h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .project-card p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-tag {
+            font-family: 'Nunito', sans-serif;
+            background: var(--accent-green);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+
+
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-green);
+            transition: width 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide title-slide" id="slide-1">
+        <div class="slide-number">1</div>
+        <h1>Programming & Game Engines<br>Part 3</h1>
+        <h2>Networked Applications in XR</h2>
+        <p class="subtitle">XR26 Course Brief - 4 Week Overview</p>
+        <div class="session-meta">
+            <p><i class="fas fa-calendar"></i> 4 Weeks</p>
+            <p><i class="fas fa-laptop-code"></i> Individual Projects</p>
+            <p><i class="fas fa-users"></i> Learning Groups</p>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Slide 2: Course Overview -->
+    <div class="slide overview-slide" id="slide-2">
+        <div class="slide-number">2</div>
+        <h2><i class="fas fa-bullseye"></i> Course Overview</h2>
+        <div class="overview-content">
+            <div class="overview-grid">
+                <div class="overview-section">
+                    <h3><i class="fas fa-graduation-cap"></i> What We'll Learn</h3>
+                    <ul>
+                        <li>Real-time development concepts</li>
+                        <li>Software architecture patterns</li>
+                        <li>API integration fundamentals</li>
+                        <li>Database management basics</li>
+                        <li>Network programming in Unity</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h3><i class="fas fa-tools"></i> Skills We'll Develop</h3>
+                    <ul>
+                        <li>Build individual networked applications</li>
+                        <li>Code organization</li>
+                        <li>External API integration</li>
+                        <li>Data persistence</li>
+                        <li>Multiplayer functionality</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h3><i class="fas fa-heart"></i> Learning Format</h3>
+                    <ul>
+                        <li>Individual work in learning groups</li>
+                        <li>Morning lectures + afternoon labs</li>
+                        <li>Weeks 1-2: Online sessions</li>
+                        <li>Weeks 3-4: On-site collaboration</li>
+                        <li>Peer learning and code reviews</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Week 1 - Code Architecture -->
+    <div class="slide content-slide" id="slide-3">
+        <div class="slide-number">3</div>
+        <h2><i class="fas fa-sitemap"></i> Week 1: Code Architecture</h2>
+        <div class="content-body">
+            <div class="week-header">
+                <h3>Foundation Week</h3>
+                <p>Online Sessions (Monday & Thursday) - Building code organization foundations</p>
+            </div>
+            <div class="week-content">
+                <div class="session-card">
+                    <h4><i class="fas fa-laptop"></i> Session 1: Clean Code Organization</h4>
+                    <ul>
+                        <li>SOLID principles in Unity</li>
+                        <li>Project organization</li>
+                        <li>Unity folder structure best practices</li>
+                        <li>Code cleanup lab with messy projects</li>
+                    </ul>
+                </div>
+                <div class="session-card">
+                    <h4><i class="fas fa-puzzle-piece"></i> Session 2: Basic Design Patterns</h4>
+                    <ul>
+                        <li>Singleton pattern for game managers</li>
+                        <li>Simple event systems</li>
+                        <li>Basic modular system design</li>
+                        <li>Code organization best practices</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Week 2 - APIs and Data -->
+    <div class="slide content-slide" id="slide-4">
+        <div class="slide-number">4</div>
+        <h2><i class="fas fa-database"></i> Week 2: APIs & Data Management</h2>
+        <div class="content-body">
+            <div class="week-header">
+                <h3>Integration Week</h3>
+                <p>Online Sessions (Monday & Thursday) - External data integration and persistence</p>
+            </div>
+            <div class="week-content">
+                <div class="session-card">
+                    <h4><i class="fas fa-cloud"></i> Session 3: Working with Simple APIs</h4>
+                    <ul>
+                        <li>REST API concepts & HTTP GET requests</li>
+                        <li>Unity async patterns</li>
+                        <li>JSON & error handling</li>
+                        <li>Weather Info project</li>
+                    </ul>
+                </div>
+                <div class="session-card">
+                    <h4><i class="fas fa-server"></i> Session 4: Database Integration</h4>
+                    <ul>
+                        <li>SQLite-net for Unity projects</li>
+                        <li>Data modeling for applications</li>
+                        <li>CRUD operations & persistence</li>
+                        <li>Game Data System project</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Week 3 - Networking -->
+    <div class="slide content-slide" id="slide-5">
+        <div class="slide-number">5</div>
+        <h2><i class="fas fa-network-wired"></i> Week 3: Networking Fundamentals</h2>
+        <div class="content-body">
+            <div class="week-header">
+                <h3>Multiplayer Week</h3>
+                <p>On-Site Sessions (Monday & Thursday) - Multiplayer experiences</p>
+            </div>
+            <div class="week-content">
+                <div class="session-card">
+                    <h4><i class="fas fa-users"></i> Session 5: Basic Network Programming</h4>
+                    <ul>
+                        <li>Unity Netcode for GameObjects basics</li>
+                        <li>Simple client-server concepts</li>
+                        <li>NetworkBehaviour & NetworkObject fundamentals</li>
+                        <li>Networked Scene lab</li>
+                    </ul>
+                </div>
+                <div class="session-card">
+                    <h4><i class="fas fa-cogs"></i> Session 6: Networking Concepts</h4>
+                    <ul>
+                        <li>NetworkVariables & basic RPCs</li>
+                        <li>Data synchronization</li>
+                        <li>Simple multiplayer interactions</li>
+                        <li>Basic collaborative features</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Week 4 - Final Project -->
+    <div class="slide content-slide" id="slide-6">
+        <div class="slide-number">6</div>
+        <h2><i class="fas fa-rocket"></i> Week 4: Final Project Development</h2>
+        <div class="content-body">
+            <div class="week-header">
+                <h3>Capstone Week</h3>
+                <p>On-Site Sessions (Monday & Thursday) - Individual networked applications</p>
+            </div>
+            <div class="week-content">
+                <div class="session-card">
+                    <h4><i class="fas fa-drafting-compass"></i> Session 7: Planning & Architecture</h4>
+                    <ul>
+                        <li>Individual project planning</li>
+                        <li>Technical specification writing</li>
+                        <li>Database schema design</li>
+                        <li>Development Phase 1 implementation</li>
+                    </ul>
+                </div>
+                <div class="session-card">
+                    <h4><i class="fas fa-presentation"></i> Session 8: Completion & Presentation</h4>
+                    <ul>
+                        <li>Final development sprint</li>
+                        <li>System integration & polish</li>
+                        <li>Professional project presentations</li>
+                        <li>Peer feedback & course reflection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Skills Development Journey -->
+    <div class="slide content-slide" id="slide-7">
+        <div class="slide-number">7</div>
+        <h2><i class="fas fa-chart-line"></i> Learning Journey</h2>
+        <div class="content-body">
+            <div class="journey-timeline">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <h4>Clean Code Organization Foundation</h4>
+                        <p>Learn SOLID principles, design patterns, and project organization. Clean up messy code to follow best practices and create organized XR applications.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <h4>External Data Integration</h4>
+                        <p>Connect applications to real-world data through APIs and implement persistent storage. Handle asynchronous operations and create error handling.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <h4>Multiplayer Development</h4>
+                        <p>Build real-time collaborative experiences using Unity Netcode. Create multiplayer scenes with player interaction and shared objects.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <h4>Project Delivery</h4>
+                        <p>Integrate all learned concepts into a networked application with persistent data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Technical Skills Overview -->
+    <div class="slide content-slide" id="slide-8">
+        <div class="slide-number">8</div>
+        <h2><i class="fas fa-laptop-code"></i> Technical Skills Mastery</h2>
+        <div class="content-body">
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <i class="fas fa-sitemap"></i>
+                    <h4>Code Organization</h4>
+                    <p>SOLID principles, design patterns (Singleton, events), clean code organization, modular systems</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>API Integration</h4>
+                    <p>REST APIs, HTTP GET requests, async/await, JSON, error handling</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-database"></i>
+                    <h4>Simple Data Persistence</h4>
+                    <p>SQLite-net basics, simple CRUD operations, basic data modeling, simple game data storage (no authentication)</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-network-wired"></i>
+                    <h4>Basic Multiplayer Networking</h4>
+                    <p>Unity Netcode basics, simple NetworkBehaviour, basic RPCs, simple state synchronization</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Assessment Overview -->
+    <div class="slide assessment-slide" id="slide-10">
+        <div class="slide-number">10</div>
+        <h2><i class="fas fa-chart-pie"></i> Assessment Framework</h2>
+        <div class="content-body">
+            <div class="assessment-breakdown">
+                <div class="assessment-item">
+                    <div class="assessment-percentage"><i class="fas fa-code"></i></div>
+                    <h4>Weekly Lab Assignments</h4>
+                    <div class="assessment-details">
+                        <p>Hands-on implementation of core concepts through progressive labs. Focus on learning and improvement.</p>
+                        <ul style="text-align: left; margin-top: 15px;">
+                            <li>Week 1: Code Organization & Clean Code Basics</li>
+                            <li>Week 2: Simple API & Database Integration</li>
+                            <li>Week 3: Basic Networking Concepts</li>
+                            <li>Week 4: Simple Project Development</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="assessment-item">
+                    <div class="assessment-percentage"><i class="fas fa-project-diagram"></i></div>
+                    <h4>Final Project</h4>
+                    <div class="assessment-details">
+                        <p>Individual simple networked application demonstrating understanding of basic course concepts.</p>
+                        <ul style="text-align: left; margin-top: 15px;">
+                            <li>Simple working application</li>
+                            <li>Basic multiplayer functionality</li>
+                            <li>Simple API integration</li>
+                            <li>Basic database storage</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="assessment-item">
+                    <div class="assessment-percentage"><i class="fas fa-users"></i></div>
+                    <h4>Collaboration & Presentation</h4>
+                    <div class="assessment-details">
+                        <p>Working effectively in learning groups and presenting your work clearly.</p>
+                        <ul style="text-align: left; margin-top: 15px;">
+                            <li>Learning Group Participation</li>
+                            <li>Helping Peers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Learning Group Structure -->
+    <div class="slide content-slide" id="slide-11">
+        <div class="slide-number">11</div>
+        <h2><i class="fas fa-users"></i> Learning Group Structure</h2>
+        <div class="content-body">
+            <div class="overview-grid">
+                <div class="overview-section">
+                    <h3><i class="fas fa-user-friends"></i> Group Formation</h3>
+                    <ul>
+                        <li>3-4 students per learning group</li>
+                        <li>Balanced technical skills and personalities</li>
+                        <li>Individual projects with peer support</li>
+                        <li>Cross-group collaboration opportunities</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h3><i class="fas fa-hands-helping"></i> Collaboration Activities</h3>
+                    <ul>
+                        <li>Code reviews and architectural feedback</li>
+                        <li>Real-time multiplayer testing</li>
+                        <li>Problem-solving and debugging support</li>
+                        <li>Knowledge sharing sessions</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h3><i class="fas fa-video"></i> Online Format (Weeks 1-2)</h3>
+                    <ul>
+                        <li>Virtual breakout rooms for group work</li>
+                        <li>Screen sharing for code reviews</li>
+                        <li>Collaborative debugging sessions</li>
+                        <li>Individual focus time with group consultation</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h3><i class="fas fa-building"></i> On-Site Format (Weeks 3-4)</h3>
+                    <ul>
+                        <li>Face-to-face learning group collaboration</li>
+                        <li>Direct support and guidance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Course Resources -->
+    <div class="slide content-slide" id="slide-12">
+        <div class="slide-number">12</div>
+        <h2><i class="fas fa-book-open"></i> Resources & Support</h2>
+        <div class="content-body">
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <i class="fas fa-wrench"></i>
+                    <h4>Development Tools</h4>
+                    <p>Unity, Optional IDE (Visual Studio Code, Rider..), Unity Netcode for GameObjects, SQLite-net</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-cloud"></i>
+                    <h4>External APIs</h4>
+                    <p>OpenWeatherMap, Discord API, Todoist, Google Calendar, NewsAPI, and more for project integration</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h4>Learning Materials</h4>
+                    <p>Official Unity documentation, design pattern guides, networking tutorials</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Course Outcomes -->
+    <div class="slide content-slide" id="slide-13">
+        <div class="slide-number">13</div>
+        <h2><i class="fas fa-trophy"></i> Course Outcomes</h2>
+        <div class="content-body">
+            <div class="overview-content">
+                <p style="font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 600; text-align: center; margin-bottom: 40px; color: var(--text-dark);">
+                    By completion, students will be able to:
+                </p>
+                <div class="overview-grid">
+                    <div class="overview-section">
+                        <h3><i class="fas fa-drafting-compass"></i> Technical Mastery</h3>
+                        <ul>
+                            <li>Apply basic SOLID principles in Unity projects</li>
+                            <li>Integrate simple external APIs with basic error handling</li>
+                            <li>Implement simple database connectivity with basic CRUD</li>
+                            <li>Create basic networked multiplayer experiences</li>
+                        </ul>
+                    </div>
+                    <div class="overview-section">
+                        <h3><i class="fas fa-rocket"></i> Professional Skills</h3>
+                        <ul>
+                            <li>Build simple, organized applications</li>
+                            <li>Troubleshoot basic networking and database issues</li>
+                            <li>Present technical projects clearly</li>
+                            <li>Document and organize code effectively</li>
+                        </ul>
+                    </div>
+                                    <div class="overview-section">
+                    <h3><i class="fas fa-briefcase"></i> Course Achievements</h3>
+                    <ul>
+                        <li>Strong foundation in development</li>
+                        <li>Professional portfolio with live projects</li>
+                        <li>Practical programming experience</li>
+                        <li>Continued learning pathways</li>
+                    </ul>
+                </div>
+                    <div class="overview-section">
+                        <h3><i class="fas fa-users"></i> Collaboration Experience</h3>
+                        <ul>
+                            <li>Peer code review and feedback skills</li>
+                            <li>Team problem-solving approaches</li>
+                            <li>Knowledge sharing</li>
+                            <li>Professional communication skills</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Next Steps -->
+    <div class="slide title-slide" id="slide-14">
+        <div class="slide-number">14</div>
+        <h1>Ready to Begin?</h1>
+    </div>
+
+    <!-- Scroll Pagination Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active" data-slide="1" title="Course Brief"></div>
+        <div class="scroll-dot" data-slide="2" title="Overview"></div>
+        <div class="scroll-dot" data-slide="3" title="Week 1"></div>
+        <div class="scroll-dot" data-slide="4" title="Week 2"></div>
+        <div class="scroll-dot" data-slide="5" title="Week 3"></div>
+        <div class="scroll-dot" data-slide="6" title="Week 4"></div>
+        <div class="scroll-dot" data-slide="7" title="Skills Journey"></div>
+        <div class="scroll-dot" data-slide="8" title="Technical Skills"></div>
+        <div class="scroll-dot" data-slide="9" title="Project Examples"></div>
+        <div class="scroll-dot" data-slide="10" title="Assessment"></div>
+        <div class="scroll-dot" data-slide="11" title="Learning Groups"></div>
+        <div class="scroll-dot" data-slide="12" title="Resources"></div>
+        <div class="scroll-dot" data-slide="13" title="Outcomes"></div>
+        <div class="scroll-dot" data-slide="14" title="Next Steps"></div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 14;
+
+        // Update progress bar based on scroll position
+        function updateProgressBar() {
+            const progress = (currentSlide / totalSlides) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }
+
+        // Update scroll indicator dots
+        function updateScrollIndicator(activeSlide) {
+            const dots = document.querySelectorAll('.scroll-dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === activeSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Scroll to specific slide
+        function scrollToSlide(slideNumber) {
+            const slide = document.getElementById(`slide-${slideNumber}`);
+            if (slide) {
+                slide.scrollIntoView({ behavior: 'smooth' });
+                currentSlide = slideNumber;
+                updateProgressBar();
+                updateScrollIndicator(slideNumber);
+            }
+        }
+
+        // Handle scroll indicator clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('scroll-dot')) {
+                const slideNumber = parseInt(e.target.dataset.slide);
+                scrollToSlide(slideNumber);
+            }
+        });
+
+        // Track which slide is currently in view
+        function handleScroll() {
+            const slides = document.querySelectorAll('.slide');
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                const slideBottom = slideTop + slide.offsetHeight;
+                
+                if (scrollPosition >= slideTop && scrollPosition < slideBottom) {
+                    const slideNumber = index + 1;
+                    if (slideNumber !== currentSlide) {
+                        currentSlide = slideNumber;
+                        updateProgressBar();
+                        updateScrollIndicator(slideNumber);
+                    }
+                }
+            });
+        }
+
+        // Throttled scroll handler for better performance
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(handleScroll, 50);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateScrollIndicator(1);
+            
+            // Add smooth animations for elements coming into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { 
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            // Observe elements for animation
+            document.querySelectorAll('.skill-card, .session-card, .overview-section, .project-card, .assessment-item, .content-card').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(el);
+            });
+
+            setTimeout(handleScroll, 100);
+        });
+    </script>
+</body>
+</html> 
