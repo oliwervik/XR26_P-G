@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Code Architecture - XR26 Programming & Game Engines</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors */
+            --primary-orange: #FF6B35;
+            --secondary-orange: #F7931E;
+            --dark-navy: #1A1A2E;
+            --deep-navy: #0F0F1A;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            
+            /* Accent Colors */
+            --accent-green: #00D4AA;
+            --accent-green-dark: #00B89C;
+            --accent-pink: #FF6B9D;
+            --text-dark: #2C2C54;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            --gradient-green: linear-gradient(135deg, #00D4AA 0%, #00B89C 100%);
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(10px);
+        }
+
+        /* Smooth Scrolling Setup */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            color: var(--white);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Section/Slide Styling */
+        .slide {
+            display: flex;
+            min-height: 100vh;
+            padding: 40px 20px;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            }
+
+        .slide-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Slide Numbers */
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-green);
+            transition: width 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Scroll Pagination Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .scroll-dot.active {
+            background: var(--accent-green);
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
+        }
+
+        .scroll-dot:hover {
+            background: var(--accent-green);
+            transform: scale(1.1);
+        }
+
+        /* Slide Separators */
+        .slide-separator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0.5;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.8rem;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            font-weight: 500;
+            opacity: 0.8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Glass Morphism Cards */
+        .overview-section, .session-card, .skill-card, .assessment-item, 
+        .timeline-content, .project-card, .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            border-left: 6px solid var(--accent-green);
+            margin: 20px 0;
+        }
+
+        /* Title Slide */
+        .title-slide {
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+        }
+
+        .course-info {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-info {
+            font-size: 1.4rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        /* Code Blocks */
+        .code-example {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-green);
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        /* Timeline */
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-time {
+            background: var(--accent-green);
+            color: var(--dark-navy);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 20px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* Icons */
+        .icon {
+            font-size: 2rem;
+            color: var(--accent-green);
+            margin-right: 15px;
+        }
+
+        .large-icon {
+            font-size: 4rem;
+            color: var(--accent-green);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1240px) {
+            .slide {
+                padding: 40px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .content-two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .scroll-indicator {
+                right: 15px;
+            }
+
+            .slide-content {
+                max-width: 100%;
+            }
+        }
+
+        /* Add vertical stack style for code example section */
+        .code-vertical-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Title Slide -->
+    <div class="slide title-slide" id="slide-1">
+        <div class="slide-number">1</div>
+        <div class="slide-content">
+            <div class="course-info">XR26 Programming & Game Engines Part 3</div>
+            <h1>Clean Code Architecture</h1>
+            <div class="subtitle">Week 1, Session 1 - Building Solid Foundations</div>
+            <div class="session-info">
+                <i class="fas fa-calendar"></i> Monday, Online Session<br>
+                <i class="fas fa-clock"></i> Morning: 2 hours | Afternoon: 3 hours
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="slide" id="slide-2">
+        <div class="slide-number">2</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-target"></i> Session Overview</h2>
+            <div class="content-two-col">
+                <div class="overview-section">
+                    <h4><i class="fas fa-bullseye"></i> Learning Objectives</h4>
+                    <ul>
+                        <li>Understand basic SOLID principles in Unity development</li>
+                        <li>Recognize the importance of clean code organization</li>
+                        <li>Apply fundamental separation of concerns in game systems</li>
+                        <li>Establish effective project structure practices</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h4><i class="fas fa-play"></i> Session Format</h4>
+                    <ul>
+                        <li><strong>Morning:</strong> Interactive lecture with examples</li>
+                        <li><strong>Afternoon:</strong> Hands-on code cleanup lab</li>
+                        <li><strong>Groups:</strong> 3-4 students supporting each other</li>
+                        <li><strong>Focus:</strong> Practical application over theory</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Morning Session Breakdown -->
+    <div class="slide" id="slide-3">
+        <div class="slide-number">3</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-sun"></i> Morning Session: Basic Code Organization</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Why Code Organization Matters</h4>
+                    <p>Real-world project examples, technical debt basics, interactive code review</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 11:00-11:10</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Basic SOLID Principles</h4>
+                    <p>Single Responsibility with practical examples</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Simple Project Organization</h4>
+                    <p>Unity folder structure, system logic separation</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-utensils"></i> 12:00-13:00</div>
+                <div class="timeline-content">
+                    <h4>Lunch</h4>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Key Concepts -->
+    <div class="slide" id="slide-4">
+        <div class="slide-number">4</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-lightbulb"></i> Key Concepts</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-cube"></i></div>
+                <h4>Single Responsibility</h4>
+                <p>One class, one job. For example, an input handler focuses only on input, not game logic.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-layer-group"></i></div>
+                <h4>Separation of Concerns</h4>
+                <p>Keep different systems separate (input, game logic, UI) for better organization, testing, and maintainability.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-folder-open"></i></div>
+                <h4>Project Structure</h4>
+                <p>Logical folder organization with clear naming conventions and comprehensive documentation.</p>
+            </div>
+        </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example -->
+    <div class="slide" id="slide-5">
+        <div class="slide-number">5</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> Before vs After: Input Handler Example</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4><i class="fas fa-times-circle" style="color: #ff4757;"></i> Before: Messy Code</h4>
+                    <pre class="code-example"><code class="language-csharp">public class Player : MonoBehaviour
+{
+    private Animator animator;
+    private AudioSource audioSource;
+    private Rigidbody rb;
+    private float health = 100f;
+    private float jumpForce = 5f;
+    
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+    
+    void Update()
+    {
+        // Everything mixed in one place
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Movement logic
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            
+            // Animation logic
+            animator.SetTrigger("Jump");
+            
+            // Sound effects
+            audioSource.PlayOneShot(jumpSound);
+            
+            // Game logic
+            health -= 10f;
+            GameObject.Find("UI").GetComponent<Canvas>().enabled = true;
+        }
+    }
+}
+</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> After: Clean Code</h4>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerInput : MonoBehaviour
+{
+    [SerializeField] private UnityEvent OnJumpPressed;
+    
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnJumpPressed?.Invoke();
+        }
+    }
+}
+
+public class PlayerMovement : MonoBehaviour
+{
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private PlayerInput input;
+    
+    void OnEnable()
+    {
+        input.OnJumpPressed.AddListener(Jump);
+    }
+    
+    void Jump()
+    {
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
+}
+
+public class PlayerAnimations : MonoBehaviour
+{
+    [SerializeField] private Animator animator;
+    [SerializeField] private PlayerInput input;
+    
+    void OnEnable()
+    {
+        input.OnJumpPressed.AddListener(PlayJumpAnimation);
+    }
+    
+    void PlayJumpAnimation()
+    {
+        animator.SetTrigger("Jump");
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-5-2">
+        <div class="slide-number">5.2</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> Before vs After: UI System</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4><i class="fas fa-times-circle" style="color: #ff4757;"></i> Before: Tightly Coupled</h4>
+                    <pre class="code-example"><code class="language-csharp">public class UIManager : MonoBehaviour
+{
+    private Text scoreText;
+    private Image healthBar;
+    
+    void Update()
+    {
+        // Direct dependencies
+        var player = GameObject.FindWithTag("Player");
+        scoreText.text = GameManager.instance.score.ToString();
+        healthBar.fillAmount = player.GetComponent<PlayerHealth>().currentHealth / 100f;
+    }
+}</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> After: Event-Driven</h4>
+                    <pre class="code-example"><code class="language-csharp">public class ScoreUI : MonoBehaviour
+{
+    [SerializeField] private Text scoreText;
+    [SerializeField] private ScoreSystem scoreSystem;
+    
+    void OnEnable()
+    {
+        scoreSystem.OnScoreChanged.AddListener(UpdateScoreDisplay);
+    }
+    
+    void UpdateScoreDisplay(int newScore)
+    {
+        scoreText.text = newScore.ToString();
+    }
+}
+
+public class HealthUI : MonoBehaviour
+{
+    [SerializeField] private Image healthBar;
+    [SerializeField] private DamageableEntity playerHealth;
+    
+    void OnEnable()
+    {
+        playerHealth.OnHealthChanged.AddListener(UpdateHealthDisplay);
+    }
+    
+    void UpdateHealthDisplay(float currentHealth)
+    {
+        healthBar.fillAmount = currentHealth / 100f;
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- SOLID Principles Walkthrough -->
+    <div class="slide" id="slide-solid-intro">
+        <div class="slide-number">5a</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-cubes"></i> What is SOLID?</h2>
+            <p>SOLID is a set of five principles for writing maintainable, understandable, and flexible code</p>
+            <ul>
+                <li><strong>S</strong>ingle Responsibility Principle</li>
+                <li><strong>O</strong>pen/Closed Principle</li>
+                <li><strong>L</strong>iskov Substitution Principle</li>
+                <li><strong>I</strong>nterface Segregation Principle</li>
+                <li><strong>D</strong>ependency Inversion Principle</li>
+            </ul>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-solid-s">
+        <div class="slide-number">5b</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-cube"></i> Single Responsibility Principle</h2>
+            <p>Each class should have one job. In Unity, keep input, game logic, and UI separate.</p>
+            <pre class="code-example"><code class="language-csharp">// BAD: All-in-one, tightly coupled
+public class GameManager : MonoBehaviour {
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            // Handle input
+            player.Jump();         // Game logic
+            ui.ShowJump();         // UI update
+            audio.PlayJumpSound(); // Audio
+        }
+    }
+}
+// Problem: GameManager does everything—hard to test, change, or reuse.
+
+// GOOD: Decoupled, single responsibility
+// Handles only input
+public class PlayerInput : MonoBehaviour {
+    public UnityEvent OnJump;
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) OnJump?.Invoke();
+    }
+}
+// Handles only player logic
+public class Player : MonoBehaviour {
+    void OnEnable() {
+        input.OnJump.AddListener(Jump);
+    }
+    void Jump() { /* ... */ }
+}
+// Handles only UI
+public class UIManager : MonoBehaviour {
+    void OnEnable() {
+        input.OnJump.AddListener(ShowJump);
+    }
+    void ShowJump() { /* ... */ }
+}
+// How it works:
+// - PlayerInput detects input and fires an event.
+// - Player and UIManager subscribe to the event and do their own jobs.
+// Result: Each class has one job, and they’re loosely coupled.
+</code></pre>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-solid-o">
+        <div class="slide-number">5c</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-door-open"></i> Open/Closed Principle</h2>
+            <p>Classes should be open for extension, but closed for modification. Use inheritance or interfaces to add new features without changing existing code.</p>
+            <pre class="code-example"><code class="language-csharp">// BAD: Modifies class for every new enemy type
+public class Enemy : MonoBehaviour {
+    public void Attack() {
+        // ...
+    }
+}
+// GOOD: Extend with subclasses
+public abstract class Enemy : MonoBehaviour {
+    public abstract void Attack();
+}
+public class Zombie : Enemy {
+    public override void Attack() { /* ... */ }
+}
+public class Robot : Enemy {
+    public override void Attack() { /* ... */ }
+}</code></pre>
+            <p>Imagine a Calculator class with a calculate method. If you initially coded it to handle only addition and subtraction, adding multiplication and division would require modifying the existing calculate method. This violates the OCP</p>
+            <p>A better approach would be to create an interface IOperation with a calculate method. Then, create separate classes like Addition, Subtraction, Multiplication, and Division, each implementing the IOperation interface. The Calculator class would then take an IOperation object as an argument, allowing you to add new operations by simply creating new implementing classes without modifying the original Calculator class</p>
+            <pre class="code-example"><code class="language-csharp">// BAD: Calculator class violates OCP
+public class Calculator
+{
+    public double Calculate(double a, double b, string operation)
+    {
+        if (operation == "add")
+        {
+            return a + b;
+        }
+        else if (operation == "subtract")
+        {
+            return a - b;
+        }
+        // To add new operations like multiply or divide,
+        // this method would need to be modified.
+        return 0;
+    }
+}
+
+// GOOD: Calculator adheres to OCP using interfaces
+public interface IOperation
+{
+    double Calculate(double a, double b);
+}
+
+public class Addition : IOperation
+{
+    public double Calculate(double a, double b) => a + b;
+}
+
+public class Subtraction : IOperation
+{
+    public double Calculate(double a, double b) => a - b;
+}
+
+public class Multiplication : IOperation
+{
+    public double Calculate(double a, double b) => a * b;
+}
+
+public class Division : IOperation
+{
+    public double Calculate(double a, double b) => a / b;
+}
+
+public class BetterCalculator
+{
+    public double Calculate(IOperation operation, double a, double b)
+    {
+        return operation.Calculate(a, b);
+    }
+}
+
+// Usage Example:
+// var calculator = new BetterCalculator();
+// double resultAdd = calculator.Calculate(new Addition(), 10, 5); // 15
+// double resultMultiply = calculator.Calculate(new Multiplication(), 10, 5); // 50
+// New operations can be added without changing BetterCalculator.
+</code></pre>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-solid-l">
+        <div class="slide-number">5d</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-exchange-alt"></i> Liskov Substitution Principle</h2>
+            <p>Subclasses should be usable anywhere their parent class is expected. In Unity, this means using base types and interfaces correctly.</p>
+            <pre class="code-example"><code class="language-csharp">public class PowerUp : MonoBehaviour {
+    public virtual void Apply(Player player) { /* ... */ }
+}
+public class SpeedBoost : PowerUp {
+    public override void Apply(Player player) { player.speed += 5; }
+}
+public class Shield : PowerUp {
+    public override void Apply(Player player) { player.shielded = true; }
+}
+// Usage:
+void GivePowerUp(PowerUp powerUp, Player player) {
+    powerUp.Apply(player); // Works for any PowerUp subclass
+}</code></pre>
+            <p><strong>Common LSP Violation: Rectangle and Square</strong></p>
+            <p>Consider a <code>Rectangle</code> base class and a <code>Square</code> subclass. Mathematically, a square is a type of rectangle. However, if the <code>Rectangle</code> class has methods to set width and height independently, a <code>Square</code> subclass that maintains equal sides will behave unexpectedly when its width or height is changed independently. This violates LSP because a <code>Square</code> cannot be substituted for a <code>Rectangle</code> without altering the inherent properties and potentially breaking client code that expects independent width and height manipulation.</p>
+            <pre class="code-example"><code class="language-csharp">// BAD: Square violates LSP if Rectangle's methods allow independent width/height
+public class Rectangle
+{
+    public virtual int Width { get; set; }
+    public virtual int Height { get; set; }
+
+    public int Area => Width * Height;
+}
+
+public class Square : Rectangle
+{
+    public override int Width
+    {
+        get => base.Width;
+        set { base.Width = value; base.Height = value; }
+    }
+
+    public override int Height
+    {
+        get => base.Height;
+        set { base.Width = value; base.Height = value; }
+    }
+}
+
+// Client code (any part of the application that uses these shape classes) that expects Rectangle behavior might break:
+// Rectangle rect = new Square();
+// rect.Width = 5;
+// rect.Height = 10; // For a Square, this would make Width also 10, breaking expectation
+
+// GOOD: Design with LSP in mind, perhaps avoiding direct inheritance for Square
+// or ensuring contracts are upheld. One solution is to use an interface:
+public interface IShape
+{
+    int GetArea();
+}
+
+public class Rect : IShape
+{
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public int GetArea() => Width * Height;
+}
+
+public class Sq : IShape
+{
+    public int Side { get; set; }
+    public int GetArea() => Side * Side;
+}
+
+// Now, client code (any part of the application that uses these shapes) treats them as distinct shapes with area calculation,
+// instead of relying on mutable dimensions that behave differently:
+// IShape squareShape = new Sq { Side = 5 };
+// IShape rectangleShape = new Rect { Width = 5, Height = 10 };
+// Console.WriteLine(squareShape.GetArea()); // 25
+// Console.WriteLine(rectangleShape.GetArea()); // 50
+</code></pre>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-solid-i">
+        <div class="slide-number">5e</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code-branch"></i> Interface Segregation Principle</h2>
+            <p>Don't force classes to implement interfaces they don't use. In Unity, use small, focused interfaces for different interactions.</p>
+            <pre class="code-example"><code class="language-csharp">public interface IInteractable {
+    void OnInteract();
+}
+public interface IDamageable {
+    void TakeDamage(float amount);
+}
+// Only implement what's needed
+public class Button : MonoBehaviour, IInteractable {
+    public void OnInteract() { /* ... */ }
+}
+public class DestructibleObject : MonoBehaviour, IDamageable {
+    public void TakeDamage(float amount) { /* ... */ }
+}
+// XR-specific example
+public class VRGrabbable : MonoBehaviour, IInteractable {
+    public void OnInteract() { /* Handle VR grab */ }
+}</code></pre>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-solid-d">
+        <div class="slide-number">5f</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-arrows-alt-v"></i> Dependency Inversion Principle</h2>
+            <p>High-level modules should depend on abstractions, not low-level modules.</p>
+            <pre class="code-example"><code class="language-csharp">// BAD: High-level module depends on concrete implementation
+public class WeaponController : MonoBehaviour
+{
+    private Gun gun;  // Concrete dependency
+
+    void Start()
+    {
+        gun = GetComponent<Gun>();
+    }
+
+    void Fire()
+    {
+        gun.Shoot();  // Tightly coupled to Gun class
+    }
+}
+
+// GOOD: Both depend on abstraction
+public interface IWeapon
+{
+    void Fire();
+}
+
+public class Gun : MonoBehaviour, IWeapon
+{
+    public void Fire()
+    {
+        // Gun-specific implementation
+    }
+}
+
+public class WeaponController : MonoBehaviour
+{
+    [SerializeField] private IWeapon weapon;  // Depends on abstraction
+
+    void Fire()
+    {
+        weapon.Fire();  // Works with any IWeapon
+    }
+}</code></pre>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Project Organization Walkthrough -->
+    <div class="slide" id="slide-org">
+        <div class="slide-number">5f</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-folder-open"></i> Project Organization in Unity</h2>
+            <p>Good project structure makes your code easier to find, understand, and maintain.</p>
+            <ul>
+                <li><strong>Folders:</strong> Scripts, Prefabs, Scenes, Materials, Audio, etc.</li>
+                <li><strong>Naming:</strong> Use clear, consistent names (e.g., <code>PlayerController</code>, <code>InputManager</code>).</li>
+                <li><strong>Separation:</strong> Keep input handling, game logic, and UI in separate folders and scripts.</li>
+            </ul>
+            <img src="https://user-images.githubusercontent.com/your-folder-structure-diagram.png" alt="Unity Folder Structure Example" style="max-width: 600px; width: 100%; margin: 20px 0; border-radius: 10px;" />
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-org-example">
+        <div class="slide-number">5g</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-random"></i> Before & After: Project Refactor</h2>
+            <div class="content-two-col">
+                <div>
+                    <h4>Before</h4>
+                    <h5>Original Folder Structure</h5>
+                    <pre class="code-example"><code class="language-plaintext">Assets/
+  Player.cs
+  GameManager.cs
+  VRInput.cs
+  Main.unity
+  Materials/
+  Prefabs/</code></pre>
+
+                    <h5>Player.cs (Before Refactor)</h5>
+                    <pre class="code-example"><code class="language-csharp">public class Player : MonoBehaviour {
+    // Handles input, logic, and UI
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            // Jump logic
+            // Update UI
+            // Play sound
+        }
+    }
+    // ... 500+ lines ...
+}</code></pre>
+                </div>
+                <div>
+                    <h4>After</h4>
+                    <h5>Refactored Folder Structure</h5>
+                    <pre class="code-example"><code class="language-plaintext">Assets/
+  Scripts/
+    Player/
+      PlayerController.cs
+      PlayerInput.cs
+    Managers/
+      GameManager.cs
+    VR/
+      VRInput.cs
+  Scenes/
+    Main.unity
+  Materials/
+  Prefabs/</code></pre>
+
+                    <h5>PlayerController.cs (After Refactor)</h5>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerController : MonoBehaviour {
+    public void Jump() { /* ... */ }
+}</code></pre>
+
+                    <h5>PlayerInput.cs (After Refactor)</h5>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerInput : MonoBehaviour {
+    public UnityEvent OnJump;
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) OnJump?.Invoke();
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <div class="slide" id="slide-discuss">
+        <div class="slide-number">5h</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-comments"></i> Discussion Prompt</h2>
+            <p>Where have you seen messy code or project structure? How would you refactor it using these principles?</p>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Afternoon Session -->
+    <div class="slide" id="slide-6">
+        <div class="slide-number">6</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-laptop-code"></i> Afternoon Lab: Code Cleanup</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Lab Work</h4>
+                    <p>Organize scripts, break apart large classes, separate input handling from game logic, implement basic interfaces, group review, peer feedback, instructor review</p>
+                    <p><strong>Lab Repository:</strong> <a href="https://github.com/oliwervik/oliwervik-XR26_Session_1_Clean_Code" target="_blank">https://github.com/oliwervik/oliwervik-XR26_Session_1_Clean_Code</a></p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 14:45-15:00</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Lab Work Continues</h4>
+                    <p>Continue cleanup, documentation, and group review</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Lab Tasks -->
+    <div class="slide" id="slide-7">
+        <div class="slide-number">7</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-tasks"></i> Lab Tasks Overview</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h4><i class="fas fa-search"></i> Task 1: Identify Issues</h4>
+                    <ul>
+                        <li>Review messy codebase with your group</li>
+                        <li>Document SOLID principle violations</li>
+                        <li>Create simple refactoring plan</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-cut"></i> Task 2: Break Down Classes</h4>
+                    <ul>
+                        <li>Split monolithic GameManager</li>
+                        <li>Create focused classes for specific jobs</li>
+                        <li>Apply Single Responsibility principle</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-arrows-alt-h"></i> Task 3: Separate Systems</h4>
+                    <ul>
+                        <li>Remove direct dependencies</li>
+                        <li>Implement event-driven communication</li>
+                        <li>Create clear system boundaries</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-users"></i> Task 4: Group Review</h4>
+                    <ul>
+                        <li>Present refactoring decisions</li>
+                        <li>Discuss trade-offs and alternatives</li>
+                        <li>Get feedback on organization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- What You'll Learn -->
+    <div class="slide" id="slide-8">
+        <div class="slide-number">8</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-graduation-cap"></i> What You'll Learn Today</h2>
+            <div class="content-two-col">
+                <div class="skill-card">
+                    <h4><i class="fas fa-eye"></i> Recognition Skills</h4>
+                    <ul>
+                        <li>Identify messy code patterns</li>
+                        <li>Spot responsibility violations</li>
+                        <li>Recognize tight coupling issues</li>
+                        <li>Find organization problems</li>
+                    </ul>
+                </div>
+                <div class="skill-card">
+                    <h4><i class="fas fa-tools"></i> Practical Skills</h4>
+                    <ul>
+                        <li>Apply basic SOLID principles</li>
+                        <li>Organize Unity projects effectively</li>
+                        <li>Separate input handling from game logic</li>
+                        <li>Use simple interfaces for abstraction</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="slide" id="slide-10">
+        <div class="slide-number">10</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-clipboard-check"></i> Prerequisites & Preparation</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-check-square"></i> What You Need</h4>
+                    <ul>
+                        <li>Unity 6 installed and working</li>
+                        <li>Basic C# knowledge from Parts 1-2</li>
+                    </ul>
+                </div>
+                 <div class="content-card">
+                <h4><i class="fas fa-info-circle"></i> Learning Group Assignment</h4>
+                <p>You'll be working in groups of 3-4 students. Groups provide consultation and peer review, but you'll still do individual coding work.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="slide" id="slide-11">
+        <div class="slide-number">11</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-arrow-right"></i> For next class on Thursday</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-book"></i> Simple Homework</h4>
+                    <ul>
+                        <li>Read about the Singleton pattern</li>
+                        <li>Reflect on today's cleanup challenges</li>
+                        <li>Think about patterns in your own code</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-calendar-plus"></i> Thursday Preview</h4>
+                    <ul>
+                        <li>Basic Design Patterns (Session 2)</li>
+                        <li>Singleton pattern implementation</li>
+                        <li>Simple event systems</li>
+                        <li>Building modular systems</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-section" style="margin-top: 30px;">
+                <h4><i class="fas fa-question-circle"></i> Questions to Consider</h4>
+                <p style="text-align: center; font-size: 1.1rem;">
+                    What organization challenges did you face today?<br>
+                    How can better architecture help your projects?
+                </p>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Scroll Pagination Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active" data-slide="1" title="Title"></div>
+        <div class="scroll-dot" data-slide="2" title="Overview"></div>
+        <div class="scroll-dot" data-slide="3" title="Morning Schedule"></div>
+        <div class="scroll-dot" data-slide="4" title="Key Concepts"></div>
+        <div class="scroll-dot" data-slide="5" title="Code Example"></div>
+        <div class="scroll-dot" data-slide="6" title="Afternoon Lab"></div>
+        <div class="scroll-dot" data-slide="7" title="Lab Tasks"></div>
+        <div class="scroll-dot" data-slide="8" title="Learning Outcomes"></div>
+        <div class="scroll-dot" data-slide="10" title="Prerequisites"></div>
+        <div class="scroll-dot" data-slide="11" title="Next Steps"></div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        // Update progress bar based on scroll position
+        function updateProgressBar() {
+            const progress = (currentSlide / totalSlides) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }
+
+        // Update scroll indicator dots
+        function updateScrollIndicator(activeSlide) {
+            const dots = document.querySelectorAll('.scroll-dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === activeSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Scroll to specific slide
+        function scrollToSlide(slideNumber) {
+            const slide = document.getElementById(`slide-${slideNumber}`);
+            if (slide) {
+                slide.scrollIntoView({ behavior: 'smooth' });
+                currentSlide = slideNumber;
+                updateProgressBar();
+                updateScrollIndicator(slideNumber);
+            }
+        }
+
+        // Handle scroll indicator clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('scroll-dot')) {
+                const slideNumber = parseInt(e.target.dataset.slide);
+                scrollToSlide(slideNumber);
+            }
+        });
+
+        // Track which slide is currently in view
+        function handleScroll() {
+            const slides = document.querySelectorAll('.slide');
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                const slideBottom = slideTop + slide.offsetHeight;
+                
+                if (scrollPosition >= slideTop && scrollPosition < slideBottom) {
+                    const slideNumber = index + 1;
+                    if (slideNumber !== currentSlide) {
+                        currentSlide = slideNumber;
+                        updateProgressBar();
+                        updateScrollIndicator(slideNumber);
+                    }
+                }
+            });
+        }
+
+        // Throttled scroll handler for better performance
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(handleScroll, 50);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateScrollIndicator(1);
+            
+            // Add smooth animations for elements coming into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { 
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            // Observe elements for animation
+            document.querySelectorAll('.skill-card, .session-card, .overview-section, .project-card, .assessment-item, .content-card').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(el);
+            });
+
+            setTimeout(handleScroll, 100);
+        });
+    </script>
+</body>
+</html> 
