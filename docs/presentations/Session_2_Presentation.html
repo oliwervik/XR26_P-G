@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Design Patterns - Programming & Game Engines</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors */
+            --primary-orange: #FF6B35;
+            --secondary-orange: #F7931E;
+            --dark-navy: #1A1A2E;
+            --deep-navy: #0F0F1A;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            
+            /* Accent Colors */
+            --accent-green: #00D4AA;
+            --accent-green-dark: #00B89C;
+            --accent-pink: #FF6B9D;
+            --text-dark: #2C2C54;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            --gradient-green: linear-gradient(135deg, #00D4AA 0%, #00B89C 100%);
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(10px);
+        }
+
+        /* Smooth Scrolling Setup */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            color: var(--white);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Content Container with Max Width */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Section/Slide Styling */
+        .slide {
+            display: flex;
+            min-height: 100vh;
+            padding: 40px 20px;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            scroll-snap-align: start;
+        }
+
+        /* Slide Numbers */
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-green);
+            transition: width 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Scroll Pagination Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .scroll-dot.active {
+            background: var(--accent-green);
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
+        }
+
+        .scroll-dot:hover {
+            background: var(--accent-green);
+            transform: scale(1.1);
+        }
+
+        /* Slide Separators */
+        .slide-separator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0.5;
+        }
+
+        /* Glass Morphism Cards */
+        .overview-section, .session-card, .skill-card, .assessment-item,
+        .timeline-content, .project-card, .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            border-left: 6px solid var(--accent-green);
+        }
+
+        /* Content Grid with Max Width Consideration */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1240px) {
+            .slide {
+                padding: 40px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px 15px;
+            }
+            
+            .content-two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .scroll-indicator {
+                right: 15px;
+            }
+            
+            .slide-content {
+                max-width: 100%;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.8rem;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            font-weight: 500;
+            opacity: 0.8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        p {
+            margin-bottom: 1rem; /* Added margin to paragraphs */
+        }
+
+        /* Title Slide */
+        .title-slide {
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+        }
+
+        .course-info {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-info {
+            font-size: 1.4rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 20px;
+            margin-top: 0.5rem; /* Added margin to lists */
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        /* Code Blocks */
+        .code-example {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-green);
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+       /* Timeline */
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-time {
+            background: var(--accent-green);
+            color: var(--dark-navy);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 20px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* Icons */
+        .icon {
+            font-size: 2rem;
+            color: var(--accent-green);
+            margin-right: 15px;
+        }
+
+        .large-icon {
+            font-size: 4rem;
+            color: var(--accent-green);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Add vertical stack style for code example section */
+        .code-vertical-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Title Slide -->
+    <div class="slide title-slide" id="slide-1">
+        <div class="slide-number">1</div>
+        <div class="slide-content">
+            <div class="course-info">Programming & Game Engines Part 3</div>
+            <h1>Basic Design Patterns</h1>
+            <div class="subtitle">Week 1, Session 2 - Essential Patterns for Robust Applications</div>
+            <div class="session-info">
+                <i class="fas fa-calendar"></i> Thursday, Online Session<br>
+                <i class="fas fa-clock"></i> Morning: 2 hours | Afternoon: 3 hours
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="slide" id="slide-2">
+        <div class="slide-number">2</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-target"></i> Session Overview</h2>
+            <div class="content-two-col">
+                <div class="overview-section">
+                    <h4><i class="fas fa-bullseye"></i> Learning Objectives</h4>
+                    <ul>
+                        <li>Understand when and why to use basic design patterns in game development.</li>
+                        <li>Implement the Singleton pattern for simple global managers.</li>
+                        <li>Utilize simple event systems for basic communication.</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h4><i class="fas fa-play"></i> Session Format</h4>
+                    <ul>
+                        <li><strong>Morning:</strong> Lecture on Singleton Pattern</li>
+                        <li><strong>Afternoon:</strong> Hands-on lab for pattern implementation</li>
+                        <li><strong>Groups:</strong> 3-4 students supporting each other</li>
+                        <li><strong>Focus:</strong> Practical application over theory</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Morning Session Breakdown -->
+    <div class="slide" id="slide-3">
+        <div class="slide-number">3</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-sun"></i> Morning Session: Essential Patterns</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Session Opening</h4>
+                    <p>Quick review of Monday's cleanup work, Q&A on code organization, Introduction to simple design patterns</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Singleton Pattern</h4>
+                    <p>When and why to use Singleton, Simple GameManager singleton example</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 11:00-11:15</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Simple Event System</h4>
+                    <p>Basic event-driven communication, Unity Events vs simple C# events, Player health event system example</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Session Wrap and Planning</h4>
+                    <p>Preview of Week 2 API topics</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-utensils"></i> 12:00-13:00</div>
+                <div class="timeline-content">
+                    <h4>Lunch</h4>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Afternoon Session Breakdown -->
+    <div class="slide" id="slide-4">
+        <div class="slide-number">4</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-laptop-code"></i> Afternoon Lab: Simple Modular System</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Lab Work: Singleton & Event System</h4>
+                    <p>Individual project setup, implement Singleton for GameManager, and create a basic event system. Focus on testing and peer code review within groups.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 2:30-2:45</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Lab Work: Integration & Review</h4>
+                    <p>Lab work continues after the break.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Key Concepts -->
+    <div class="slide" id="slide-5">
+        <div class="slide-number">5</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-lightbulb"></i> Key Concepts</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-star"></i></div>
+                <h4>Singleton Pattern</h4>
+                <p>Ensures a class has only one instance and provides a global point of access. Ideal for managers like a GameManager or AudioManager.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-broadcast-tower"></i></div>
+                <h4>Simple Event System</h4>
+                <p>Allows components to communicate without direct references, promoting loose coupling. Useful for UI updates or game state changes.</p>
+            </div>
+        </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: Singleton -->
+    <div class="slide" id="slide-6">
+        <div class="slide-number">6</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> Singleton Pattern Example</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4><i class="fas fa-times-circle" style="color: #ff4757;"></i> Before: Direct Reference / GameObject.Find</h4>
+                    <pre class="code-example"><code class="language-csharp">public class Player : MonoBehaviour
+{
+    void Update()
+    {
+        // Tightly coupled and inefficient
+        GameObject.Find("GameManager").GetComponent<GameManager>().AddScore(10);
+    }
+}
+
+public class GameManager : MonoBehaviour
+{
+    public int score = 0;
+    public void AddScore(int amount)
+    {
+        score += amount;
+        Debug.Log("Score: " + score);
+    }
+}
+</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> After: Singleton Implementation</h4>
+                    <pre class="code-example"><code class="language-csharp">public class GameManager : MonoBehaviour
+{
+    public static GameManager Instance { get; private set; }
+    public int score = 0;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Optional: persist across scenes
+        }
+    }
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+        Debug.Log("Score: " + score);
+    }
+}
+
+public class Player : MonoBehaviour
+{
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Clean and globally accessible
+            GameManager.Instance.AddScore(10);
+        }
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: Simple Event System -->
+    <div class="slide" id="slide-7">
+        <div class="slide-number">7</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> Simple Event System Example</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4><i class="fas fa-times-circle" style="color: #ff4757;"></i> Before: Direct Method Calls</h4>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerHealth : MonoBehaviour
+{
+    public int currentHealth = 100;
+    public UIManager uiManager; // Direct reference
+
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        uiManager.UpdateHealthDisplay(currentHealth); // Tightly coupled
+        if (currentHealth <= 0)
+        {
+            // Handle death
+        }
+    }
+}
+
+public class UIManager : MonoBehaviour
+{
+    public Text healthText;
+    public void UpdateHealthDisplay(int health)
+    {
+        healthText.text = "Health: " + health;
+    }
+}
+</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> After: UnityEvent / C# Event</h4>
+                    <pre class="code-example"><code class="language-csharp">using UnityEngine;
+using UnityEngine.Events; // For UnityEvent
+
+public class PlayerHealth : MonoBehaviour
+{
+    public int currentHealth = 100;
+    public UnityEvent<int> OnHealthChanged; // UnityEvent for inspector setup
+    // public event System.Action<int> OnHealthChanged; // Alternative: C# event
+
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        OnHealthChanged?.Invoke(currentHealth); // Trigger event
+        // OnHealthChanged?.Invoke(currentHealth); // For C# event
+        if (currentHealth <= 0)
+        {
+            // Handle death
+        }
+    }
+}
+
+public class HealthDisplay : MonoBehaviour
+{
+    public Text healthText;
+    public PlayerHealth playerHealth; // Reference to the event source
+
+    void OnEnable()
+    {
+        playerHealth.OnHealthChanged.AddListener(UpdateHealthDisplay);
+    }
+
+    void OnDisable()
+    {
+        playerHealth.OnHealthChanged.RemoveListener(UpdateHealthDisplay);
+    }
+
+    void UpdateHealthDisplay(int health)
+    {
+        healthText.text = "Health: " + health;
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+
+    <!-- Code Example: Basic Error Handling -->
+    <div class="slide" id="slide-8">
+        <div class="slide-number">8</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-bug"></i> Basic Error Handling Example</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4><i class="fas fa-times-circle" style="color: #ff4757;"></i> Before: Unhandled Error (Null Reference)</h4>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerController : MonoBehaviour
+{
+    public Rigidbody playerRigidbody; // Not assigned in Inspector
+
+    void Start()
+    {
+        // This will throw a NullReferenceException if playerRigidbody is not assigned
+        playerRigidbody.AddForce(Vector3.up * 10f, ForceMode.Impulse);
+    }
+}
+</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> After: Simple Null Check & Logging</h4>
+                    <pre class="code-example"><code class="language-csharp">public class PlayerController : MonoBehaviour
+{
+    public Rigidbody playerRigidbody;
+
+    void Start()
+    {
+        if (playerRigidbody == null)
+        {
+            Debug.LogError("Player Rigidbody is not assigned! Please assign it in the Inspector.", this);
+            return; // Stop execution if critical component is missing
+        }
+        playerRigidbody.AddForce(Vector3.up * 10f, ForceMode.Impulse);
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+
+    <!-- Lab Tasks -->
+    <div class="slide" id="slide-9">
+        <div class="slide-number">9</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-tasks"></i> Lab Tasks Overview</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h4><i class="fas fa-star"></i> Task 1: Implement Singleton</h4>
+                    <ul>
+                        <li>Create a GameManager Singleton</li>
+                        <li>Ensure global access</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-broadcast-tower"></i> Task 2: Create Event System</h4>
+                    <ul>
+                        <li>Define a simple UnityEvent or C# event</li>
+                        <li>Implement a publisher (e.g., PlayerHealth)</li>
+                        <li>Implement a subscriber (e.g., HealthDisplay)</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-link"></i> Task 3: Integrate Systems</h4>
+                    <ul>
+                        <li>Connect your Singleton and Event System</li>
+                        <li>Ensure smooth communication</li>
+                        <li>Handle basic errors</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-users"></i> Task 4: Group Review</h4>
+                    <ul>
+                        <li>Present your implementations</li>
+                        <li>Discuss design choices</li>
+                        <li>Get peer feedback</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- What You'll Learn -->
+    <div class="slide" id="slide-10">
+        <div class="slide-number">10</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-graduation-cap"></i> What You'll Learn Today</h2>
+            <div class="content-two-col">
+                <div class="skill-card">
+                    <h4><i class="fas fa-eye"></i> Recognition Skills</h4>
+                    <ul>
+                        <li>Identify scenarios for basic design patterns</li>
+                        <li>Recognize benefits of decoupled systems</li>
+                    </ul>
+                </div>
+                <div class="skill-card">
+                    <h4><i class="fas fa-tools"></i> Practical Skills</h4>
+                    <ul>
+                        <li>Implement the Singleton pattern</li>
+                        <li>Create and use simple event systems</li>
+                        <li>Integrate modular components</li>
+                        <li>Apply patterns to improve code structure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="slide" id="slide-11">
+        <div class="slide-number">11</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-clipboard-check"></i> Prerequisites & Preparation</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-check-square"></i> What You Need</h4>
+                    <ul>
+                        <li>Unity 6 installed and working</li>
+                        <li>Basic C# knowledge from previous parts</li>
+                        <li>Familiarity with code organization from Session 1</li>
+                    </ul>
+                </div>
+                 <div class="content-card">
+                <h4><i class="fas fa-info-circle"></i> Learning Group Assignment</h4>
+                <p>You'll be working in groups of 3-4 students. Groups provide consultation and peer review, but you'll still do individual coding work.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="slide" id="slide-12">
+        <div class="slide-number">12</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-arrow-right"></i> For next class on Monday</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-book"></i> Simple Homework</h4>
+                    <ul>
+                        <li>Research basic REST API concepts</li>
+                        <li>Think about how external data could enhance your projects</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-calendar-plus"></i> Monday Preview</h4>
+                    <ul>
+                        <li>Working with Simple APIs</li>
+                        <li>UnityWebRequest for network communication</li>
+                        <li>JSON serialization and deserialization</li>
+                        <li>Displaying external data in your application</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-section" style="margin-top: 30px;">
+                <h4><i class="fas fa-question-circle"></i> Questions to Consider</h4>
+                <p style="text-align: center; font-size: 1.1rem;">
+                    How can patterns simplify your code?<br>
+                    When is a simple solution better than a complex one?
+                </p>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Scroll Pagination Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active" data-slide="1" title="Title"></div>
+        <div class="scroll-dot" data-slide="2" title="Overview"></div>
+        <div class="scroll-dot" data-slide="3" title="Morning Schedule"></div>
+        <div class="scroll-dot" data-slide="4" title="Afternoon Lab"></div>
+        <div class="scroll-dot" data-slide="5" title="Key Concepts"></div>
+        <div class="scroll-dot" data-slide="6" title="Singleton Example"></div>
+        <div class="scroll-dot" data-slide="7" title="Event System Example"></div>
+        <div class="scroll-dot" data-slide="8" title="Error Handling Example"></div>
+        <div class="scroll-dot" data-slide="9" title="Lab Tasks"></div>
+        <div class="scroll-dot" data-slide="10" title="Learning Outcomes"></div>
+        <div class="scroll-dot" data-slide="11" title="Prerequisites"></div>
+        <div class="scroll-dot" data-slide="12" title="Next Steps"></div>
+    </div>
+    
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12; // Adjusted for new slide
+        
+        // Update progress bar based on scroll position
+        function updateProgressBar() {
+            const progress = (currentSlide / totalSlides) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }
+        
+        // Update scroll indicator dots
+        function updateScrollIndicator(activeSlide) {
+            const dots = document.querySelectorAll('.scroll-dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === activeSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // Scroll to specific slide
+        function scrollToSlide(slideNumber) {
+            const slide = document.getElementById(`slide-${slideNumber}`);
+            if (slide) {
+                slide.scrollIntoView({ behavior: 'smooth' });
+                currentSlide = slideNumber;
+                updateProgressBar();
+                updateScrollIndicator(slideNumber);
+            }
+        }
+        
+        // Handle scroll indicator clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('scroll-dot')) {
+                const slideNumber = parseInt(e.target.dataset.slide);
+                scrollToSlide(slideNumber);
+            }
+        });
+        
+        // Track which slide is currently in view
+        function handleScroll() {
+            const slides = document.querySelectorAll('.slide');
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                const slideBottom = slideTop + slide.offsetHeight;
+                
+                if (scrollPosition >= slideTop && scrollPosition < slideBottom) {
+                    const slideNumber = index + 1;
+                    if (slideNumber !== currentSlide) {
+                        currentSlide = slideNumber;
+                        updateProgressBar();
+                        updateScrollIndicator(slideNumber);
+                    }
+                }
+            });
+        }
+        
+        // Throttled scroll handler for better performance
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(handleScroll, 50);
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateScrollIndicator(1);
+            
+            // Add smooth animations for elements coming into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+        
+            // Observe elements for animation
+            document.querySelectorAll('.skill-card, .session-card, .overview-section, .project-card, .assessment-item, .content-card').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(el);
+            });
+        
+            setTimeout(handleScroll, 100);
+        });
+    </script>
+</body>
+</html>
