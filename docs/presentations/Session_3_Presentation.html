@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working with APIs - Programming & Game Engines</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors */
+            --primary-orange: #FF6B35;
+            --secondary-orange: #F7931E;
+            --dark-navy: #1A1A2E;
+            --deep-navy: #0F0F1A;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            
+            /* Accent Colors */
+            --accent-green: #00D4AA;
+            --accent-green-dark: #00B89C;
+            --accent-pink: #FF6B9D;
+            --text-dark: #2C2C54;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            --gradient-green: linear-gradient(135deg, #00D4AA 0%, #00B89C 100%);
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(10px);
+        }
+
+        /* Smooth Scrolling Setup */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+            color: var(--white);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Content Container with Max Width */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Section/Slide Styling */
+        .slide {
+            display: flex;
+            min-height: 100vh;
+            padding: 40px 20px;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            scroll-snap-align: start;
+        }
+
+        /* Slide Numbers */
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-green);
+            transition: width 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Scroll Pagination Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .scroll-dot.active {
+            background: var(--accent-green);
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
+        }
+
+        .scroll-dot:hover {
+            background: var(--accent-green);
+            transform: scale(1.1);
+        }
+
+        /* Slide Separators */
+        .slide-separator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0.5;
+        }
+
+        /* Glass Morphism Cards */
+        .overview-section, .session-card, .skill-card, .assessment-item,
+        .timeline-content, .project-card, .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            border-left: 6px solid var(--accent-green);
+        }
+
+        /* Content Grid with Max Width Consideration */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1240px) {
+            .slide {
+                padding: 40px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px 15px;
+            }
+            
+            .content-two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .scroll-indicator {
+                right: 15px;
+            }
+            
+            .slide-content {
+                max-width: 100%;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.8rem;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            font-weight: 500;
+            opacity: 0.8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* Title Slide */
+        .title-slide {
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+        }
+
+        .course-info {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-info {
+            font-size: 1.4rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 20px;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        /* Code Blocks */
+        .code-example {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-green);
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+       /* Timeline */
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-time {
+            background: var(--accent-green);
+            color: var(--dark-navy);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 20px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* Icons */
+        .icon {
+            font-size: 2rem;
+            color: var(--accent-green);
+            margin-right: 15px;
+        }
+
+        .large-icon {
+            font-size: 4rem;
+            color: var(--accent-green);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Add vertical stack style for code example section */
+        .code-vertical-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Title Slide -->
+    <div class="slide title-slide" id="slide-1">
+        <div class="slide-number">1</div>
+        <div class="slide-content">
+            <div class="course-info">Programming & Game Engines Part 3</div>
+            <h1>Working with APIs</h1>
+            <div class="subtitle">Week 2, Session 3 - Connecting Applications to External Data</div>
+            <div class="session-info">
+                <i class="fas fa-calendar"></i> Monday, Online Session<br>
+                <i class="fas fa-clock"></i> Morning: 2 hours | Afternoon: 3 hours
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="slide" id="slide-2">
+        <div class="slide-number">2</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-target"></i> Session Overview</h2>
+            <div class="content-two-col">
+                <div class="overview-section">
+                    <h4><i class="fas fa-bullseye"></i> Learning Objectives</h4>
+                    <ul>
+                        <li>Understand what APIs are and their purpose.</li>
+                        <li>Learn to make HTTP GET requests for data retrieval.</li>
+                        <li>Grasp JSON basics and data serialization.</li>
+                    </ul>
+                </div>
+                <div class="overview-section">
+                    <h4><i class="fas fa-play"></i> Session Format</h4>
+                    <ul>
+                        <li><strong>Morning:</strong> Lecture on API Integration</li>
+                        <li><strong>Afternoon:</strong> Hands-on lab for API implementation</li>
+                        <li><strong>Groups:</strong> 3-4 students supporting each other</li>
+                        <li><strong>Focus:</strong> Practical application</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Morning Session Breakdown -->
+    <div class="slide" id="slide-3">
+        <div class="slide-number">3</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-sun"></i> Morning Session: API Integration</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Session Opening and Context</h4>
+                    <p>Review of Week 1 architecture, Introduction to connecting apps to external data, API examples.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>API Basics</h4>
+                    <p>What are REST APIs and why use them? HTTP GET requests (focus on data retrieval), JSON basics and serialization. Interactive Demo: Exploring a weather API.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 11:00-11:10</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>HTTP Requests</h4>
+                    <p>UnityWebRequest approach, async/await patterns. Live Coding: Weather data retrieval. Error handling (connection failed, invalid data). Learning Group Activity: Choose an API for practice.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-utensils"></i> 12:00-13:00</div>
+                <div class="timeline-content">
+                    <h4>Lunch</h4>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Afternoon Session Breakdown -->
+    <div class="slide" id="slide-4">
+        <div class="slide-number">4</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-laptop-code"></i> Afternoon Lab: Weather Info Application</h2>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Lab Project Setup</h4>
+                    <p>
+                        Download the provided lab project from 
+                        <a href="https://github.com/oliwervik/XR26_APIs_Databases" target="_blank" rel="noopener">
+                            https://github.com/oliwervik/XR26_APIs_Databases
+                        </a>. This project is pre-configured with essential packages and starter classes for both APIs and Databases (Sesssion 3 and 4).
+                    </p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>API Integration</h4>
+                    <p>Continue on the WeatherAPI implementation in the lab project (Follow the //TODO), JSON deserialization for weather data, Error messages for users. Individual work with group consultation.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time"><i class="fas fa-coffee"></i> 2:30-2:45</div>
+                <div class="timeline-content">
+                    <h4>Break</h4>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Review and Next Steps</h4>
+                    <p>Review your API integration, discuss challenges, and prepare for the next session on databases.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Key Concepts -->
+    <div class="slide" id="slide-5">
+        <div class="slide-number">5</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-lightbulb"></i> Key Concepts</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-cloud-sun"></i></div>
+                <h4>REST APIs</h4>
+                <p>Understand how applications communicate with external services to retrieve or send data using standard HTTP methods.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-exchange-alt"></i></div>
+                <h4>HTTP Requests</h4>
+                <p>Learn to send GET requests to fetch data from web servers and handle responses within your application.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-file-code"></i></div>
+                <h4>JSON Data</h4>
+                <p>Work with JSON (JavaScript Object Notation) for structuring and exchanging data between your application and APIs.</p>
+            </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-sync-alt"></i></div>
+                <h4>Asynchronous Operations</h4>
+                <p>Manage network requests efficiently using asynchronous programming patterns to keep your application responsive.</p>
+            </div>
+        </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: HTTP GET Request -->
+    <div class="slide" id="slide-6">
+        <div class="slide-number">6</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> HTTP GET Request with Async/Await</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4>Fetching Data with UnityWebRequest</h4>
+                    <pre class="code-example"><code class="language-csharp">using UnityEngine;
+using UnityEngine.Networking;
+using System.Threading.Tasks;
+
+public class ApiClient : MonoBehaviour
+{
+    [SerializeField] private string apiKey = "YOUR_API_KEY";
+    [SerializeField] private string baseUrl = "http://api.openweathermap.org/data/2.5/weather";
+    
+    public async Task<string> GetWeatherDataAsync(string city)
+    {
+        string url = $"{baseUrl}?q={city}&appid={apiKey}";
+        
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            await request.SendWebRequest();
+            
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                return request.downloadHandler.text;
+            }
+            
+            Debug.LogError($"Request failed: {request.error}");
+            return null;
+        }
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: Error Handling -->
+    <div class="slide" id="slide-7">
+        <div class="slide-number">7</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-exclamation-triangle"></i> Robust Error Handling</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4>Comprehensive Error Handling</h4>
+                    <pre class="code-example"><code class="language-csharp">public async Task<WeatherData> GetWeatherDataAsync(string city)
+{
+    // Input validation
+    if (string.IsNullOrWhiteSpace(city))
+    {
+        Debug.LogError("City name cannot be empty");
+        return null;
+    }
+    
+    string url = $"{baseUrl}?q={city}&appid={apiKey}";
+    
+    using (UnityWebRequest request = UnityWebRequest.Get(url))
+    {
+        await request.SendWebRequest();
+        
+        // Handle different error types specifically
+        switch (request.result)
+        {
+            case UnityWebRequest.Result.Success:
+                return ParseWeatherData(request.downloadHandler.text);
+                
+            case UnityWebRequest.Result.ConnectionError:
+                Debug.LogError($"Network connection failed: {request.error}");
+                break;
+                
+            case UnityWebRequest.Result.ProtocolError:
+                Debug.LogError($"HTTP Error {request.responseCode}: {request.error}");
+                break;
+                
+            case UnityWebRequest.Result.DataProcessingError:
+                Debug.LogError($"Data processing failed: {request.error}");
+                break;
+        }
+        
+        return null;
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: JSON Deserialization with Newtonsoft.Json -->
+    <div class="slide" id="slide-8">
+        <div class="slide-number">8</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-code"></i> JSON Deserialization with Newtonsoft.Json</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4>Data Models with JsonProperty Attributes</h4>
+                    <pre class="code-example"><code class="language-csharp">using System;
+using Newtonsoft.Json;
+
+[Serializable]
+public class WeatherData
+{
+    [JsonProperty("main")]
+    public MainWeatherInfo Main { get; set; }
+    
+    [JsonProperty("weather")]
+    public WeatherDescription[] Weather { get; set; }
+    
+    [JsonProperty("name")]
+    public string CityName { get; set; }
+    
+    [JsonProperty("cod")]
+    public int StatusCode { get; set; }
+    
+    // Computed properties for easier access
+    public float TemperatureInCelsius => Main?.Temperature - 273.15f ?? 0f;
+    public string PrimaryDescription => Weather?.Length > 0 ? Weather[0].Description : "Unknown";
+    
+    // Validation method
+    public bool IsValid => StatusCode == 200 && Main != null && !string.IsNullOrEmpty(CityName);
+}
+
+[Serializable]
+public class MainWeatherInfo
+{
+    [JsonProperty("temp")]
+    public float Temperature { get; set; }
+    
+    [JsonProperty("feels_like")]
+    public float FeelsLike { get; set; }
+    
+    [JsonProperty("humidity")]
+    public int Humidity { get; set; }
+    
+    [JsonProperty("pressure")]
+    public int Pressure { get; set; }
+}
+</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4>JSON Parsing Method</h4>
+                    <pre class="code-example"><code class="language-csharp">private WeatherData ParseWeatherData(string jsonString)
+{
+    try
+    {
+        var settings = new JsonSerializerSettings
+        {
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        };
+        
+        return JsonConvert.DeserializeObject<WeatherData>(jsonString, settings);
+    }
+    catch (JsonException ex)
+    {
+        Debug.LogError($"JSON parsing failed: {ex.Message}");
+        return null;
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Code Example: UI Integration -->
+    <div class="slide" id="slide-9">
+        <div class="slide-number">9</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-desktop"></i> UI Integration Best Practices</h2>
+            <div class="code-vertical-stack">
+                <div class="content-card">
+                    <h4>Responsive UI with Loading States</h4>
+                    <pre class="code-example"><code class="language-csharp">public class WeatherUIController : MonoBehaviour
+{
+    [SerializeField] private Button getWeatherButton;
+    [SerializeField] private TextMeshProUGUI statusText;
+    [SerializeField] private WeatherApiClient apiClient;
+    
+    private async void OnGetWeatherClicked()
+    {
+        string cityName = cityInputField.text;
+        
+        // Validate input
+        if (string.IsNullOrWhiteSpace(cityName))
+        {
+            SetStatusText("Please enter a city name");
+            return;
+        }
+        
+        // Show loading state
+        getWeatherButton.interactable = false;
+        SetStatusText("Loading weather data...");
+        
+        try
+        {
+            var weatherData = await apiClient.GetWeatherDataAsync(cityName);
+            
+            if (weatherData != null && weatherData.IsValid)
+            {
+                DisplayWeatherData(weatherData);
+                SetStatusText("Weather data loaded successfully");
+            }
+            else
+            {
+                SetStatusText("Failed to get weather data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error: {ex.Message}");
+            SetStatusText("An error occurred. Please try again.");
+        }
+        finally
+        {
+            // Always re-enable button
+            getWeatherButton.interactable = true;
+        }
+    }
+}
+</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Lab Tasks -->
+    <div class="slide" id="slide-10">
+        <div class="slide-number">10</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-tasks"></i> Lab Tasks Overview</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h4><i class="fas fa-cloud-download-alt"></i> Task 1: Implement API Client</h4>
+                    <ul>
+                        <li>Set up UnityWebRequest for GET requests.</li>
+                        <li>Fetch data from OpenWeatherMap API.</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-code-branch"></i> Task 2: Handle JSON Data</h4>
+                    <ul>
+                        <li>Create C# classes matching JSON structure.</li>
+                        <li>Deserialize API responses into objects.</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Task 3: Error Handling</h4>
+                    <ul>
+                        <li>Implement robust error handling for network operations.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- What You'll Learn -->
+    <div class="slide" id="slide-11">
+        <div class="slide-number">11</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-graduation-cap"></i> What You'll Learn Today</h2>
+            <div class="content-two-col">
+                <div class="skill-card">
+                    <h4><i class="fas fa-eye"></i> Recognition Skills</h4>
+                    <ul>
+                        <li>Identify opportunities to integrate external data.</li>
+                        <li>Recognize the structure and purpose of REST APIs.</li>
+                    </ul>
+                </div>
+                <div class="skill-card">
+                    <h4><i class="fas fa-tools"></i> Practical Skills</h4>
+                    <ul>
+                        <li>Perform HTTP GET requests.</li>
+                        <li>Parse JSON data into C# objects.</li>
+                        <li>Implement robust error handling for network operations.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="slide" id="slide-12">
+        <div class="slide-number">12</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-clipboard-check"></i> Prerequisites & Preparation</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-check-square"></i> What You Need</h4>
+                    <ul>
+                        <li>Unity installed and working.</li>
+                        <li>C# knowledge from previous parts.</li>
+                        <li>Familiarity with code organization and design patterns.</li>
+                    </ul>
+                </div>
+                 <div class="content-card">
+                <h4><i class="fas fa-info-circle"></i> Learning Group Assignment</h4>
+                <p>You'll be working in groups of 3-4 students. Groups provide consultation and peer review, but you'll still do individual coding work.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="slide" id="slide-13">
+        <div class="slide-number">13</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-arrow-right"></i> For next class on Thursday</h2>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4><i class="fas fa-book"></i> Homework</h4>
+                    <ul>
+                        <li>Research basic database concepts.</li>
+                        <li>Consider how data persistence can enhance your projects.</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4><i class="fas fa-calendar-plus"></i> Thursday Preview</h4>
+                    <ul>
+                        <li>Basic Database Storage</li>
+                        <li>SQLite-net integration</li>
+                        <li>CRUD operations (Create, Read, Update, Delete)</li>
+                        <li>Saving and loading application data</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-section" style="margin-top: 30px;">
+                <h4><i class="fas fa-question-circle"></i> Questions to Consider</h4>
+                <p style="text-align: center; font-size: 1.1rem;">
+                    How can external data enhance your applications?<br>
+                    What are common challenges when working with APIs?
+                </p>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Scroll Pagination Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active" data-slide="1" title="Title"></div>
+        <div class="scroll-dot" data-slide="2" title="Overview"></div>
+        <div class="scroll-dot" data-slide="3" title="Morning Schedule"></div>
+        <div class="scroll-dot" data-slide="4" title="Afternoon Lab"></div>
+        <div class="scroll-dot" data-slide="5" title="Key Concepts"></div>
+        <div class="scroll-dot" data-slide="6" title="Modern HTTP GET"></div>
+        <div class="scroll-dot" data-slide="7" title="Error Handling"></div>
+        <div class="scroll-dot" data-slide="8" title="JSON with Newtonsoft"></div>
+        <div class="scroll-dot" data-slide="9" title="UI Integration"></div>
+        <div class="scroll-dot" data-slide="10" title="Lab Tasks"></div>
+        <div class="scroll-dot" data-slide="11" title="Learning Outcomes"></div>
+        <div class="scroll-dot" data-slide="12" title="Prerequisites"></div>
+        <div class="scroll-dot" data-slide="13" title="Next Steps"></div>
+    </div>
+    
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 13; // Adjusted for new slide count
+        
+        // Update progress bar based on scroll position
+        function updateProgressBar() {
+            const progress = (currentSlide / totalSlides) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }
+        
+        // Update scroll indicator dots
+        function updateScrollIndicator(activeSlide) {
+            const dots = document.querySelectorAll('.scroll-dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === activeSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // Scroll to specific slide
+        function scrollToSlide(slideNumber) {
+            const slide = document.getElementById(`slide-${slideNumber}`);
+            if (slide) {
+                slide.scrollIntoView({ behavior: 'smooth' });
+                currentSlide = slideNumber;
+                updateProgressBar();
+                updateScrollIndicator(slideNumber);
+            }
+        }
+        
+        // Handle scroll indicator clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('scroll-dot')) {
+                const slideNumber = parseInt(e.target.dataset.slide);
+                scrollToSlide(slideNumber);
+            }
+        });
+        
+        // Track which slide is currently in view
+        function handleScroll() {
+            const slides = document.querySelectorAll('.slide');
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                const slideBottom = slideTop + slide.offsetHeight;
+                
+                if (scrollPosition >= slideTop && scrollPosition < slideBottom) {
+                    const slideNumber = index + 1;
+                    if (slideNumber !== currentSlide) {
+                        currentSlide = slideNumber;
+                        updateProgressBar();
+                        updateScrollIndicator(slideNumber);
+                    }
+                }
+            });
+        }
+        
+        // Throttled scroll handler for better performance
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(handleScroll, 50);
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateScrollIndicator(1);
+            
+            // Add smooth animations for elements coming into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+        
+            // Observe elements for animation
+            document.querySelectorAll('.skill-card, .session-card, .overview-section, .project-card, .assessment-item, .content-card').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(el);
+            });
+        
+            setTimeout(handleScroll, 100);
+        });
+    </script>
+</body>
+</html>
