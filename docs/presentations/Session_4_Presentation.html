@@ -484,146 +484,165 @@
                 <h4>CRUD Operations</h4>
                 <p>Master the fundamental operations: Create, Read, Update, and Delete data entries within your database.</p>
             </div>
+            <div class="content-card">
+                <div class="large-icon"><i class="fas fa-laptop-code"></i></div>
+                <h4>SQL Playground</h4>
+                <p>Experiment with SQL queries in a safe environment. <a href="https://runsql.com/r" target="_blank" style="color: var(--accent-green);">Try it here!</a></p>
+            </div>
         </div>
         </div>
         <div class="slide-separator"></div>
     </div>
-
-    <!-- Code Example: SQLite-net Setup -->
+    
+    <!-- Database Types -->
     <div class="slide" id="slide-6">
         <div class="slide-number">6</div>
         <div class="slide-content">
-            <h2><i class="fas fa-code"></i> SQLite-net Setup</h2>
-            <div class="code-vertical-stack">
+            <h2><i class="fas fa-database"></i> Types of Databases</h2>
+            <div class="content-two-col">
                 <div class="content-card">
-                    <h4>Database Connection and Table Creation</h4>
-                    <pre class="code-example"><code class="language-csharp">using SQLite;
-using UnityEngine;
-using System.IO;
-
-public class SimpleDatabaseManager : MonoBehaviour
-{
-    private SQLiteConnection _connection;
-    private string _databasePath;
-
-    void Awake()
-    {
-        // For example purposes, use a simple path. In a real app, use Application.persistentDataPath
-        _databasePath = "example_data.db";
-        Debug.Log($"Database path: {_databasePath}");
-        InitializeDatabase();
-    }
-
-    private void InitializeDatabase()
-    {
-        try
-        {
-            _connection = new SQLiteConnection(_databasePath);
-            _connection.CreateTable&lt;UserPreference&gt;();
-            _connection.CreateTable&lt;GameScore&gt;();
-            Debug.Log("Database initialized and tables created.");
-        }
-        catch (SQLiteException ex)
-        {
-            Debug.LogError($"Failed to initialize database: {ex.Message}");
-        }
-    }
-
-    void OnDestroy()
-    {
-        if (_connection != null)
-        {
-            _connection.Close();
-            Debug.Log("Database connection closed.");
-        }
-    }
-}
-
-// Generic Example Data Models
-public class UserPreference
-{
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
-    public string ThemeSetting { get; set; } // e.g., "Dark", "Light"
-    public float SoundVolume { get; set; } // 0.0 to 1.0
-}
-
-public class GameScore
-{
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
-    public string PlayerName { get; set; }
-    public int Score { get; set; }
-    public string Level { get; set; } // e.g., "Forest", "Desert"
-    public System.DateTime DateAchieved { get; set; }
-}
-</code></pre>
+                    <h4>SQL (Relational) Databases</h4>
+                    <p>Organized data into tables with rows and columns. Think of it like a collection of spreadsheets where tables can be linked together.</p>
+                    <ul>
+                        <li><strong>Schema:</strong> Predefined structure (strong schema).</li>
+                        <li><strong>Examples:</strong> SQLite, MySQL, PostgreSQL.</li>
+                        <li><strong>Use Cases:</strong> Good for structured data like user profiles, inventory, game stats.</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4>NoSQL Databases</h4>
+                    <p>A broad category of databases that don't use the traditional table-based relational model. They offer more flexibility.</p>
+                    <ul>
+                        <li><strong>Document Databases:</strong> Store data in JSON-like documents (e.g., MongoDB). Good for flexible, semi-structured data.</li>
+                        <li><strong>Key-Value Stores:</strong> Simple databases where data is stored as a key-value pair (e.g., Redis). Very fast for caching.</li>
+                        <li><strong>Graph Databases:</strong> Focus on relationships between data points (e.g., Neo4j). Excellent for social networks or complex relationships.</li>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="slide-separator"></div>
     </div>
 
-    <!-- Code Example: CRUD Operations -->
+    <!-- SQLite-net: The Big Picture -->
     <div class="slide" id="slide-7">
         <div class="slide-number">7</div>
         <div class="slide-content">
-            <h2><i class="fas fa-exchange-alt"></i> CRUD Operations</h2>
-            <div class="code-vertical-stack">
+            <h2><i class="fas fa-cogs"></i> SQLite-net: The Big Picture</h2>
+            <p class="subtitle">We'll set up a database, define our data structures (models), and then perform operations on them.</p>
+            <div class="content-grid" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="content-card">
-                    <h4>Saving and Loading Player Settings</h4>
-                    <pre class="code-example"><code class="language-csharp">public void SavePlayerSettings(PlayerSettings settings)
-{
-    try
-    {
-        if (settings.Id == 0) // New setting
-        {
-            _connection.Insert(settings);
-            Debug.Log($"New settings saved with ID: {settings.Id}");
-        }
-        else // Update existing
-        {
-            _connection.Update(settings);
-            Debug.Log($"Settings updated for ID: {settings.Id}");
-        }
-    }
-    catch (SQLiteException ex)
-    {
-        Debug.LogError($"Failed to save player settings: {ex.Message}");
-    }
-}
+                    <div class="large-icon"><i class="fas fa-sitemap"></i></div>
+                    <h4>1. Define Models</h4>
+                    <p>Create C# classes that represent our database tables.</p>
+                </div>
+                <div class="content-card">
+                    <div class="large-icon"><i class="fas fa-plug"></i></div>
+                    <h4>2. Connect & Create Tables</h4>
+                    <p>Establish a connection to a database file and create the table structures.</p>
+                </div>
+                <div class="content-card">
+                    <div class="large-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <h4>3. Interact (CRUD)</h4>
+                    <p>Use simple commands to Create, Read, Update, and Delete data.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
 
-public PlayerSettings LoadPlayerSettings()
+    <!-- Step 1: Define Data Models -->
+    <div class="slide" id="slide-8">
+        <div class="slide-number">8</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-sitemap"></i> Step 1: Define Data Models</h2>
+            <p class="subtitle">A data model is a C# class that mirrors the structure of a database table. Each property in the class corresponds to a column in the table.</p>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4>User Preference Model</h4>
+                    <p>This model stores settings for a user, like theme and volume.</p>
+                    <pre class="code-example"><code class="language-csharp">public class UserPreference
 {
-    try
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public string ThemeSetting { get; set; }
+    public float SoundVolume { get; set; }
+}</code></pre>
+                    <ul>
+                        <li><code>[PrimaryKey, AutoIncrement]</code>: Marks 'Id' as the unique identifier for each row. The database will automatically assign a new number for each entry.</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4>Game Score Model</h4>
+                    <p>This model stores individual game scores.</p>
+                    <pre class="code-example"><code class="language-csharp">public class GameScore
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public string PlayerName { get; set; }
+    public int Score { get; set; }
+    public string Level { get; set; }
+    public System.DateTime DateAchieved { get; set; }
+}</code></pre>
+                    <p>Each instance of this class will represent a single score entry in our database.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+    
+    <!-- Step 2: Database Connection -->
+    <div class="slide" id="slide-9">
+        <div class="slide-number">9</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-plug"></i> Step 2: Database Connection</h2>
+            <p class="subtitle">Now we create a manager class to handle the database file and create tables based on our models.</p>
+            <div class="content-card">
+                <h4>Database Manager Skeleton</h4>
+                <pre class="code-example"><code class="language-csharp">using SQLite;
+using UnityEngine;
+public class DatabaseManager : MonoBehaviour
+{
+    private SQLiteConnection _connection;
+    void Awake()
     {
-        // Assuming only one player settings entry for simplicity
-        return _connection.Table<PlayerSettings>().FirstOrDefault();
-    }
-    catch (SQLiteException ex)
-    {
-        Debug.LogError($"Failed to load player settings: {ex.Message}");
-        return null;
-    }
-}
+        // Path to the database file
+        string dbPath = System.IO.Path.Combine(Application.persistentDataPath, "my_game_data.db");
+        _connection = new SQLiteConnection(dbPath);
+        
+        // Create tables if they don't exist
+        _connection.CreateTable&lt;UserPreference&gt;();
+        _connection.CreateTable&lt;GameScore&gt;();
 
-public void DeletePlayerSettings(int id)
-{
-    try
-    {
-        _connection.Delete<PlayerSettings>(id);
-        Debug.Log($"Player settings with ID {id} deleted.");
+        Debug.Log("Database connected and tables created.");
     }
-    catch (SQLiteException ex)
+    void OnDestroy()
     {
-        Debug.LogError($"Failed to delete player settings: {ex.Message}");
+        // Always close the connection when the object is destroyed
+        if (_connection != null)
+        {
+            _connection.Close();
+        }
     }
 }
 </code></pre>
-                </div>
-                <div class="content-card">
-                    <h4>Adding and Retrieving Game Scores</h4>
-                    <pre class="code-example"><code class="language-csharp">public void AddGameScore(string playerName, int score, string level)
+                <ul>
+                    <li><code>Application.persistentDataPath</code>: A safe, writable directory on any device (PC, mobile, etc.). This is the correct place to store user data.</li>
+                    <li><code>_connection.CreateTable&lt;T&gt;()</code>: This is the magic command. It checks if a table for the given model (e.g., <code>UserPreference</code>) exists. If not, it creates it. If it already exists, it does nothing.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Step 3: CRUD - Create -->
+    <div class="slide" id="slide-10">
+        <div class="slide-number">10</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-plus-circle"></i> Step 3: CRUD - Create (Insert)</h2>
+            <p class="subtitle">To add a new record to the database, we use the <code>Insert</code> method.</p>
+            <div class="content-card">
+                <h4>Adding a New Game Score</h4>
+                <pre class="code-example"><code class="language-csharp">public void AddGameScore(string playerName, int score, string level)
 {
     var newScore = new GameScore
     {
@@ -632,42 +651,120 @@ public void DeletePlayerSettings(int id)
         Level = level,
         DateAchieved = System.DateTime.Now
     };
-    try
-    {
-        _connection.Insert(newScore);
-        Debug.Log($"Game score added: {playerName} - {score} on {level}");
-    }
-    catch (SQLiteException ex)
-    {
-        Debug.LogError($"Failed to add game score: {ex.Message}");
-    }
-}
-
-public System.Collections.Generic.List<GameScore> GetTopGameScores(int count)
-{
-    try
-    {
-        return _connection.Table<GameScore>()
-                          .OrderByDescending(s => s.Score)
-                          .Take(count)
-                          .ToList();
-    }
-    catch (SQLiteException ex)
-    {
-        Debug.LogError($"Failed to retrieve game scores: {ex.Message}");
-        return new System.Collections.Generic.List<GameScore>();
-    }
+    
+    _connection.Insert(newScore);
+    // After insertion, newScore.Id will be populated with the new ID.
+    Debug.Log($"Game score added for {playerName} with ID: {newScore.Id}");
 }
 </code></pre>
+                <ul>
+                    <li>First, create an instance of your data model (<code>GameScore</code>).</li>
+                    <li>Then, simply pass this object to the <code>_connection.Insert()</code> method.</li>
+                    <li>SQLite-net handles the conversion from a C# object to a database row.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Step 3: CRUD - Read -->
+    <div class="slide" id="slide-11">
+        <div class="slide-number">11</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-search"></i> Step 3: CRUD - Read (Query)</h2>
+            <p class="subtitle">To get data from the database, you can query the table. This is like asking the database for records that match certain criteria.</p>
+            <div class="content-two-col">
+                <div class="content-card">
+                    <h4>Get a Single Record</h4>
+                    <p>Use <code>FirstOrDefault()</code> to get the first matching item or <code>null</code> if none is found. Good for unique items like player settings.</p>
+                    <pre class="code-example"><code class="language-csharp">public UserPreference LoadPlayerSettings()
+{
+    // Returns the first entry in the UserPreference table.
+    return _connection.Table<UserPreference>().FirstOrDefault();
+}</code></pre>
+                </div>
+                <div class="content-card">
+                    <h4>Get Multiple Records</h4>
+                    <p>Use LINQ methods like <code>Where()</code>, <code>OrderByDescending()</code>, and <code>Take()</code> to build powerful queries.</p>
+                    <pre class="code-example"><code class="language-csharp">public List<GameScore> GetTopScores(int count)
+{
+    return _connection.Table<GameScore>()
+                      .OrderByDescending(s => s.Score)
+                      .Take(count)
+                      .ToList();
+}</code></pre>
+                    <p>This chain of commands gets all scores, sorts them from highest to lowest, takes the top <code>count</code>, and returns them as a List.</p>
                 </div>
             </div>
         </div>
         <div class="slide-separator"></div>
     </div>
 
+    <!-- Step 3: CRUD - Update -->
+    <div class="slide" id="slide-12">
+        <div class="slide-number">12</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-edit"></i> Step 3: CRUD - Update</h2>
+            <p class="subtitle">To modify an existing record, you use the <code>Update</code> method. SQLite-net uses the Primary Key (<code>Id</code>) to find the right row to change.</p>
+            <div class="content-card">
+                <h4>Updating a User's Theme</h4>
+                <pre class="code-example"><code class="language-csharp">public void UpdateTheme(UserPreference settings, string newTheme)
+{
+    settings.ThemeSetting = newTheme;
+    _connection.Update(settings);
+    Debug.Log($"Theme updated to {newTheme} for ID: {settings.Id}");
+}
+// --- How you would use it ---
+// 1. First, load the settings
+var currentSettings = LoadPlayerSettings();
+if(currentSettings != null)
+{
+    // 2. Then, call update
+    UpdateTheme(currentSettings, "Dark");
+}
+</code></pre>
+                <ul>
+                    <li>You must first have an object that has been retrieved from the database.</li>
+                    <li>Modify the properties of that object.</li>
+                    <li>Pass the modified object to <code>_connection.Update()</code>. The <code>Id</code> tells SQLite which record to update.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
+    <!-- Step 3: CRUD - Delete -->
+    <div class="slide" id="slide-13">
+        <div class="slide-number">13</div>
+        <div class="slide-content">
+            <h2><i class="fas fa-trash-alt"></i> Step 3: CRUD - Delete</h2>
+            <p class="subtitle">To remove a record, use the <code>Delete</code> method, passing the primary key of the item you want to remove.</p>
+            <div class="content-card">
+                <h4>Deleting a Score</h4>
+                <pre class="code-example"><code class="language-csharp">public void DeleteScore(int scoreId)
+{
+    // The generic parameter <GameScore> tells the DB which table to look in.
+    _connection.Delete<GameScore>(scoreId);
+    Debug.Log($"Score with ID {scoreId} has been deleted.");
+}
+// --- How you would use it ---
+// 1. Get the ID of a score you want to delete
+int idToDelete = someScore.Id;
+// 2. Call the delete method
+DeleteScore(idToDelete);
+</code></pre>
+                <ul>
+                    <li>The <code>Delete</code> method is very efficient. It only needs the table and the <code>Id</code> of the row you want to remove.</li>
+                    <li>It's a permanent action, so be careful!</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-separator"></div>
+    </div>
+
     <!-- Lab Tasks -->
-    <div class="slide" id="slide-8">
-        <div class="slide-number">8</div>
+    <div class="slide" id="slide-14">
+        <div class="slide-number">14</div>
         <div class="slide-content">
             <h2><i class="fas fa-tasks"></i> Lab Tasks Overview</h2>
             <div class="content-grid">
@@ -698,8 +795,8 @@ public System.Collections.Generic.List<GameScore> GetTopGameScores(int count)
     </div>
 
     <!-- What You'll Learn -->
-    <div class="slide" id="slide-9">
-        <div class="slide-number">9</div>
+    <div class="slide" id="slide-15">
+        <div class="slide-number">15</div>
         <div class="slide-content">
             <h2><i class="fas fa-graduation-cap"></i> What You'll Learn Today</h2>
             <div class="content-two-col">
@@ -724,8 +821,8 @@ public System.Collections.Generic.List<GameScore> GetTopGameScores(int count)
     </div>
 
     <!-- Prerequisites -->
-    <div class="slide" id="slide-10">
-        <div class="slide-number">10</div>
+    <div class="slide" id="slide-16">
+        <div class="slide-number">16</div>
         <div class="slide-content">
             <h2><i class="fas fa-clipboard-check"></i> Prerequisites & Preparation</h2>
             <div class="content-two-col">
@@ -747,8 +844,8 @@ public System.Collections.Generic.List<GameScore> GetTopGameScores(int count)
     </div>
 
     <!-- Next Steps -->
-    <div class="slide" id="slide-11">
-        <div class="slide-number">11</div>
+    <div class="slide" id="slide-17">
+        <div class="slide-number">17</div>
         <div class="slide-content">
             <h2><i class="fas fa-arrow-right"></i> For next class on Monday</h2>
             <div class="content-two-col">
@@ -786,17 +883,23 @@ public System.Collections.Generic.List<GameScore> GetTopGameScores(int count)
         <div class="scroll-dot" data-slide="3" title="Morning Schedule"></div>
         <div class="scroll-dot" data-slide="4" title="Afternoon Lab"></div>
         <div class="scroll-dot" data-slide="5" title="Key Concepts"></div>
-        <div class="scroll-dot" data-slide="6" title="SQLite Setup"></div>
-        <div class="scroll-dot" data-slide="7" title="CRUD Operations"></div>
-        <div class="scroll-dot" data-slide="8" title="Lab Tasks"></div>
-        <div class="scroll-dot" data-slide="9" title="Learning Outcomes"></div>
-        <div class="scroll-dot" data-slide="10" title="Prerequisites"></div>
-        <div class="scroll-dot" data-slide="11" title="Next Steps"></div>
+        <div class="scroll-dot" data-slide="6" title="DB Types"></div>
+        <div class="scroll-dot" data-slide="7" title="SQLite Overview"></div>
+        <div class="scroll-dot" data-slide="8" title="Data Models"></div>
+        <div class="scroll-dot" data-slide="9" title="DB Connection"></div>
+        <div class="scroll-dot" data-slide="10" title="CRUD - Create"></div>
+        <div class="scroll-dot" data-slide="11" title="CRUD - Read"></div>
+        <div class="scroll-dot" data-slide="12" title="CRUD - Update"></div>
+        <div class="scroll-dot" data-slide="13" title="CRUD - Delete"></div>
+        <div class="scroll-dot" data-slide="14" title="Lab Tasks"></div>
+        <div class="scroll-dot" data-slide="15" title="Learning Outcomes"></div>
+        <div class="scroll-dot" data-slide="16" title="Prerequisites"></div>
+        <div class="scroll-dot" data-slide="17" title="Next Steps"></div>
     </div>
     
     <script>
         let currentSlide = 1;
-        const totalSlides = 11; // Adjusted for new slide count
+        const totalSlides = 17;
         
         // Update progress bar based on scroll position
         function updateProgressBar() {
