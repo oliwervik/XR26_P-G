@@ -788,46 +788,35 @@ if (IsOwner)
                 <h4>Basic NetworkedPlayer Script</h4>
                 <pre class="code-example"><code class="language-csharp">using Unity.Netcode;
 using UnityEngine;
+using Unity.Netcode;
 
-public class NetworkedPlayer : NetworkBehaviour
+public class Player : NetworkBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
-    
-    // Network variables automatically sync across clients
-    private NetworkVariable&lt;Vector3&gt; networkPosition = 
-        new NetworkVariable&lt;Vector3&gt;();
-    
-    void Update()
+    public float moveSpeed = 5f;
+
+    private void Update()
     {
-        if (IsOwner)
-        {
-            // Only the owner can move this player
-            HandleMovement();
-        }
-        else
-        {
-            // Other clients just follow the networked position
-            transform.position = Vector3.Lerp(
-                transform.position, 
-                networkPosition.Value, 
-                Time.deltaTime * 10f
-            );
-        }
-    }
-    
-    void HandleMovement()
-    {
+        // Only process input for the local player
+        if (!IsOwner) return;
+
         Vector3 input = new Vector3(
             Input.GetAxis("Horizontal"),
-            0,
+            0f,
             Input.GetAxis("Vertical")
         );
-        
-        Vector3 newPosition = transform.position + input * moveSpeed * Time.deltaTime;
-        transform.position = newPosition;
-        
-        // Update the network variable
-        networkPosition.Value = newPosition;
+
+
+        Vector3 move = input * moveSpeed * Time.deltaTime;
+
+        // Send the movement to the server
+        MoveServerRpc(move);
+    }
+
+    [ServerRpc]
+    private void MoveServerRpc(Vector3 move, ServerRpcParams rpcParams = default)
+    {
+        // Apply movement on the server
+        transform.position += move;
     }
 }</code></pre>
             </div>
